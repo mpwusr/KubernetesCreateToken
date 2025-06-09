@@ -60,11 +60,11 @@ kubectl create token privileged -n default
 kubectl get secret $(kubectl get sa privileged -n default -o jsonpath="{.secrets[0].name}") -n default -o jsonpath="{.data.token}" | base64 -d
 ```
 
-> ⚠️ This will not work if you're on Kubernetes 1.24+ and no legacy secrets are generated.
+>  This will not work if you're on Kubernetes 1.24+ and no legacy secrets are generated.
 
 ---
 
-### 📥 Sample `kubeconfig` Using That Token
+### Sample `kubeconfig` Using That Token
 
 If you want to use this token via `kubectl`, you can create a custom kubeconfig:
 
