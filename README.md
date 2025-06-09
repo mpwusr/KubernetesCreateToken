@@ -1,42 +1,42 @@
 # KubernetesCreateToken
 
-Yes — you can create a Kubernetes **service account token** (i.e., a bearer token) for a custom account like `podcast` using the Kubernetes RBAC system.
+Yes — you can create a Kubernetes **service account token** (i.e., a bearer token) for a custom service account like using the Kubernetes RBAC system.
 
 ---
 
-### ✅ Goal
+###  Goal
 
-Create a **service account** named `podcast` and generate a **token** it can use to authenticate to the Kubernetes API.
+Create a **service account** named `privileged` and generate a **token** it can use to authenticate to the Kubernetes API.
 
 ---
 
-### ✅ Step-by-Step (Kubernetes v1.24+)
+###  Step-by-Step (Kubernetes v1.24+)
 
 Since Kubernetes v1.24, **legacy `secrets` tokens are deprecated**. Use a **ServiceAccountToken** projection or `kubectl create token`.
 
 ---
 
-#### 🔧 1. **Create the `podcast` service account**
+####  1. **Create the `privileged` service account**
 
 ```bash
-kubectl create serviceaccount podcast -n default
+kubectl create serviceaccount privileged -n default
 ```
 
 ---
 
-#### 🔧 2. **Grant permissions (e.g., read-only access)**
+####  2. **Grant permissions (e.g., read-only access)**
 
 Here’s an example for read-only access in the default namespace:
 
 ```bash
-kubectl create role podcast-reader \
+kubectl create role privileged-reader \
   --verb=get,list,watch \
   --resource=pods,services \
   -n default
 
-kubectl create rolebinding podcast-binding \
+kubectl create rolebinding privileged-binding \
   --role=podcast-reader \
-  --serviceaccount=default:podcast \
+  --serviceaccount=default:privileged \
   -n default
 ```
 
@@ -49,7 +49,7 @@ For cluster-wide access (e.g., admin), use `ClusterRoleBinding` instead.
 ##### Option A: (Recommended, Kubernetes 1.24+)
 
 ```bash
-kubectl create token podcast -n default
+kubectl create token privileged -n default
 ```
 
 ✔️ This will return a valid JWT you can use in the `Authorization: Bearer <token>` header when accessing the API.
@@ -57,7 +57,7 @@ kubectl create token podcast -n default
 ##### Option B: (Manual secret, Kubernetes ≤1.23 or compatible)
 
 ```bash
-kubectl get secret $(kubectl get sa podcast -n default -o jsonpath="{.secrets[0].name}") -n default -o jsonpath="{.data.token}" | base64 -d
+kubectl get secret $(kubectl get sa privileged -n default -o jsonpath="{.secrets[0].name}") -n default -o jsonpath="{.data.token}" | base64 -d
 ```
 
 > ⚠️ This will not work if you're on Kubernetes 1.24+ and no legacy secrets are generated.
@@ -83,16 +83,16 @@ users:
 contexts:
 - context:
     cluster: cluster
-    user: podcast
+    user: privileged
     namespace: default
-  name: podcast-context
-current-context: podcast-context
+  name: privileged-context
+current-context: privileged-context
 ```
 
-Save as `kubeconfig-podcast.yaml`, then use:
+Save as `kubeconfig-privileged.yaml`, then use:
 
 ```bash
-KUBECONFIG=./kubeconfig-podcast.yaml kubectl get pods
+KUBECONFIG=./kubeconfig-privileged.yaml kubectl get pods
 ```
 
 ---
