@@ -44,7 +44,7 @@ For cluster-wide access (e.g., admin), use `ClusterRoleBinding` instead.
 
 ---
 
-#### 🔐 3. **Get a token for the service account**
+####  3. **Get a token for the service account**
 
 ##### Option A: (Recommended, Kubernetes 1.24+)
 
